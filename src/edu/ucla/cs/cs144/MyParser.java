@@ -39,6 +39,7 @@ import org.w3c.dom.Text;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.ErrorHandler;
+import java.text.SimpleDateFormat;
 
 
 class MyParser {
@@ -179,22 +180,57 @@ class MyParser {
         /* At this point 'doc' contains a DOM representation of an 'Items' XML
          * file. Use doc.getDocumentElement() to get the root Element. */
         System.out.println("Successfully parsed - " + xmlFile);
-        
+
+
+        /**************************************************************/
+        /**************************************************************/
+        /**************************************************************/
         /* Fill in code here (you will probably need to write auxiliary
             methods). */
+
+
+
+
+
+
         
         
         
         /**************************************************************/
+        /**************************************************************/
+        /**************************************************************/
         
     }
+
+        /* Method to convert the EBay date's to MySQL format of yyyy-MM-dd HH:mm:ss */
+    public static String convertDateTime(String dateString) {
+        //Using java.text.SimpleDateFormat to convert date with http://www.cs.ucla.edu/classes/winter15/cs144/projects/java/simpledateformat.html
+
+        //Defining format of the ebay string and the new converted string
+        SimpleDateFormat ebay_string = new SimpleDateFormat("MMM-dd-yy HH:mm:ss");
+        SimpleDateFormat converted_string = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        String output = "";
+
+        try {
+            Date parsed = ebay_string.parse(dateString);
+            output = converted_string.format(parsed);
+            
+            }
+            catch(ParseException pe) {
+                System.out.println("ERROR: Cannot parse \"" + dateString + "\"");
+            }
+
+        return output;
+    }
+
     
     public static void main (String[] args) {
         if (args.length == 0) {
             System.out.println("Usage: java MyParser [file] [file] ...");
             System.exit(1);
         }
-        
+
         /* Initialize parser. */
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
