@@ -39,6 +39,7 @@ import org.w3c.dom.Text;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.ErrorHandler;
+import java.lang.*;
 
 
 class MyParser {
@@ -90,9 +91,42 @@ class MyParser {
 
     //Helper classes for organizing the database tables
 
+    public static class Users { 
+        String user_name;
+        String user_location;
+        String user_rating;
+        String user_country;
+
+        Users(String name, String rating, String location, String country) { 
+            user_name = name; 
+            user_rating = rating;
+            user_location = location;
+            user_country = country;
+        } 
+
+        //Override equals function so our set can check equality
+        @Override
+        public boolean equals(Object obj){
+            return (((Users)obj).user_name).equals(this.user_name);
+        }
+
+        //Overrides the hashcode function
+        @Override 
+        public int hashCode() { 
+            return user_name.hashCode();
+        }
+    }
+
 
     //Set for the category, using a set to get rid of duplicates
     static Set<String> set_category = new HashSet<String>();
+    //static Map<String,Integer> map_category = new HashMap<String,Integer>();
+
+    //Set for Users
+    static Set<Users> set_users = new HashSet<Users>();
+
+    //Hashmap for file-category
+    static Map<Integer,Integer> map_filecategory = new HashMap<Integer,Integer>(); 
 
 
     /**************************************************************/
@@ -208,53 +242,79 @@ class MyParser {
         //********** ITERATING THROUGH XML DOCUMENTS
         //**************************************************************/
 
+        try { //Try-catch for FileWriter
+
         Element[] current = getElementsByTagNameNR(doc.getDocumentElement(), "Item");
 
         // Looping through all Items in XML file
         for(int i = 0; i < current.length ; i++){
 
             //Get item id
-            int itemID = Integer.parseInt(current[i].getAttribute("ItemID"));
+            int item_id = Integer.parseInt(current[i].getAttribute("ItemID"));
 
-            //Get Category information, loop through and set category.dat file
+            //Get buyer information and add to Users.dat
+            Element bids = getElementByTagNameNR(current[i], "Bids");
+            Element[] bid = getElementsByTagNameNR(bids, "Bid");
+
+            // Iterate through the bids and find the buyers
+            for (int j=0; j<bid.length; j++) {
+                // Get buyer information
+                Element buyer = getElementByTagNameNR(bid[j], "Bidder");
+
+                Users b = new Users(
+                        buyer.getAttribute("UserID"), 
+                        buyer.getAttribute("Rating"), 
+                        getElementTextByTagNameNR(buyer, "Location"), 
+                        getElementTextByTagNameNR(buyer, "Country"));
+                set_users.add(b);
+
+            }
+
+            //Get seller information and add to Users.dat
+            Element seller = getElementByTagNameNR(current[i], "Seller");
+
+            Users s = new Users(
+                    seller.getAttribute("UserID"),
+                    seller.getAttribute("Rating"),
+                    getElementTextByTagNameNR(current[i], "Location"),
+                    getElementTextByTagNameNR(current[i], "Country"));
+            set_users.add(s);
+
+            //Get Category information, loop through and set Category.dat file
             Element[] categoryXML = getElementsByTagNameNR(current[i], "Category");
-
 
             for(int cat = 0; cat < categoryXML.length ; cat++){
 
-                set_category.add(getElementText(categoryXML[cat]));
+                String category_name = getElementText(categoryXML[cat]); 
+
+                //Add category name to our Category set
+                set_category.add(category_name);
+
+                //Adding category name's hash value with item_id
+                map_filecategory.put(Math.abs(category_name.hashCode()), item_id);
+                //file_category_buffer.append(item_id + " " + columnSeparator + " " + Math.abs(category_name.hashCode()) + "\n");
 
             }
 
         }
 
-
         //**************************************************************/
-        //********** WRITING TO CATEGORY.DAT
+        //********** WRITING TO ITEM-CATEGORY.DAT -- NOT WORKING
         //**************************************************************/
-        try {
-            FileWriter category = new FileWriter("Category.dat");
-            BufferedWriter category_buffer = new BufferedWriter(category);
 
-            //category_id is a value we generate on our own
-            int category_id = 1;
+        FileWriter file_category = new FileWriter("file-category.dat");
+        BufferedWriter file_category_buffer = new BufferedWriter(file_category);
 
-            for (String curr : set_category) {
-                //String categoryEntry= curr.getValue();
+        for (Map.Entry<Integer, Integer> entry: map_filecategory.entrySet()) {
+            file_category_buffer.append(entry.getValue() + " " + columnSeparator + " " + entry.getValue() + "\n");
+        }
 
-                String entrycsv = String.format("%d " + columnSeparator + " %s\n", category_id,curr);
-                category_buffer.append(entrycsv); 
-
-                //Increase our category ID
-                category_id++;
-            }
-
-            //Close file/buffer writer
-            category_buffer.close();
-            category.close();
+        //Close file/buffer writer
+        file_category_buffer.close();
+        file_category.close();
 
         } catch (IOException e) {
-            System.out.println("ERROR: Category FileWriter error");
+            System.out.println("ERROR: FileWriter error");
         }
         
         
@@ -314,6 +374,63 @@ class MyParser {
         for (int i = 0; i < args.length; i++) {
             File currentFile = new File(args[i]);
             processFile(currentFile);
+        }
+
+        //**************************************************************/
+        //********** WRITING TO CATEGORY.DAT 
+        //**************************************************************/
+
+        try{
+            FileWriter category = new FileWriter("Category.dat");
+            BufferedWriter category_buffer = new BufferedWriter(category);
+
+            //category_id is a value we generate on our own
+            //int category_id = 1;
+
+            for (String curr : set_category) {
+
+                //Assign categiry ID with positive hash value
+                String entry = String.format("%d " + columnSeparator + " %s\n", 
+                            Math.abs(curr.hashCode()),
+                            curr);
+                category_buffer.append(entry); 
+
+                //map_category.put(curr,category_id);
+
+                //Increase our category ID
+                //category_id++;
+            }
+
+        //Close file/buffer writer
+        category_buffer.close();
+        category.close();
+
+        } catch (IOException e) {
+            System.out.println("ERROR: FileWriter error");
+        }
+
+        //**************************************************************/
+        //********** WRITING TO USERS.DAT 
+        //**************************************************************/
+
+        try{
+            FileWriter users = new FileWriter("users.dat");
+            BufferedWriter users_buffer = new BufferedWriter(users);
+            
+            for (Users u : set_users) {
+                users_buffer.append(String.format("%s " + columnSeparator + " %s " + columnSeparator + " %s " + columnSeparator + " %s\n", 
+                    u.user_name,
+                    u.user_rating,
+                    u.user_location,
+                    u.user_country));
+        }
+        //Close file/buffer writer
+        users_buffer.close();
+        users.close();
+
+
+        } catch (IOException e) {
+            System.out.println("ERROR: FileWriter error");
         }
     }
 }
