@@ -1,9 +1,9 @@
 DROP TABLE IF EXISTS `bid`;
 
-DROP TABLE IF EXISTS `category`;
-
 DROP TABLE IF EXISTS `item_category`;
 
-DROP TABLE IF EXISTS `user`;
+DROP TABLE IF EXISTS `category`;
 
 DROP TABLE IF EXISTS `item`;
+
+DROP TABLE IF EXISTS `user`;
