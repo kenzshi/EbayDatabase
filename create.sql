@@ -5,6 +5,14 @@ CREATE TABLE `category` (
   UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+CREATE TABLE `user` (
+  `id` varchar(50) NOT NULL DEFAULT '',
+  `rating` int(11) DEFAULT 0,
+  `location` varchar(100) DEFAULT NULL,
+  `country` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
 CREATE TABLE `item` (
   `id` bigint(20) NOT NULL,
   `name` varchar(250) NOT NULL,
@@ -32,12 +40,4 @@ CREATE TABLE `item_category` (
   KEY `category_id` (`category_id`),
   CONSTRAINT `item_category_ibfk_1` FOREIGN KEY (`item_id`) REFERENCES `item` (`id`) ON DELETE CASCADE,
   CONSTRAINT `item_category_ibfk_2` FOREIGN KEY (`category_id`) REFERENCES `category` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
-CREATE TABLE `user` (
-  `id` varchar(50) NOT NULL DEFAULT '',
-  `rating` int(11) DEFAULT 0,
-  `location` varchar(100) DEFAULT NULL,
-  `country` varchar(50) DEFAULT NULL,
-  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
