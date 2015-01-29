@@ -90,6 +90,40 @@ class MyParser {
     /**************************************************************/
 
     //Helper classes for organizing the database tables
+    public static class Items { 
+        String item_id;
+        String item_name;
+        String item_currently;
+        String item_buy_price;
+        String item_first_bid;
+        String item_num_bids;
+        String item_location;
+        String item_country;
+        String item_lon;
+        String item_lat;
+        String item_started;
+        String item_ends;
+        String item_description;
+        String item_seller_id;
+
+        Items(String id, String name, String currently, String buy_price, String first_bid, String num_bids, String location, String country, String lon, String lat, String started, String ends, String description, String seller_id){
+                item_id = id;
+                item_name = name;
+                item_currently = currently;
+                item_buy_price = buy_price;
+                item_first_bid = first_bid;
+                item_num_bids = num_bids;
+                item_location = location;
+                item_country = country;
+                item_lon = lon;
+                item_lat = lat;
+                item_started = started;
+                item_ends = ends;
+                item_description = description;
+                item_seller_id = seller_id;
+        }
+
+    }
 
     public static class Users { 
         String user_name;
@@ -124,6 +158,9 @@ class MyParser {
 
     //Set for Users
     static Set<Users> set_users = new HashSet<Users>();
+
+    //Set of Items
+    static Set<Items> set_items = new HashSet<Items>();
 
     //Hashmap for file-category
     static Map<Integer,Integer> map_filecategory = new HashMap<Integer,Integer>(); 
@@ -296,6 +333,47 @@ class MyParser {
 
             }
 
+            // Storing item data into Items class, insert into Items set
+            String item_id_string = current[i].getAttribute("ItemID");
+            String item_name = getElementTextByTagNameNR(current[i], "Name");
+            //Converting to $$ so use strip();
+            String item_currently = strip(getElementTextByTagNameNR(current[i], "Currently"));
+            String item_buy_price = strip(getElementTextByTagNameNR(current[i], "Buy_Price"));
+            String item_first_bid = strip(getElementTextByTagNameNR(current[i], "First_Bid"));
+            String item_num_bids = getElementTextByTagNameNR(current[i], "Number_of_Bids");
+            String item_location = getElementTextByTagNameNR(current[i], "Location");
+            String item_country = getElementTextByTagNameNR(current[i], "Country");
+            Element loc = getElementByTagNameNR(current[i], "Location");
+            String item_lon = loc.getAttribute("Longitude");
+            String item_lat = loc.getAttribute("Latitude");
+            //Converting to MySQL Datetime 
+            String item_started = convertDateTime(getElementTextByTagNameNR(current[i], "Started"));
+            String item_ends = convertDateTime(getElementTextByTagNameNR(current[i], "Ends"));
+            String item_description = getElementTextByTagNameNR(current[i], "Description");
+            String item_seller_id = getElementByTagNameNR(current[i], "Seller").getAttribute("UserID");
+
+            //VARCHAR(4000) restrictiong for item_description
+            if(item_description.length() > 4000)
+                item_description = item_description.substring(0,4000);
+
+            //Create item class and insert into set
+            Items item_set = new Items(
+                item_id_string,
+                item_name,
+                item_currently,
+                item_buy_price,
+                item_first_bid,
+                item_num_bids,
+                item_location,
+                item_country,
+                item_lon,
+                item_lat,
+                item_started,
+                item_ends,
+                item_description,
+                item_seller_id);
+            set_items.add(item_set);
+
         }
 
         //**************************************************************/
@@ -306,7 +384,7 @@ class MyParser {
         BufferedWriter file_category_buffer = new BufferedWriter(file_category);
 
         for (Map.Entry<Integer, Integer> entry: map_filecategory.entrySet()) {
-            file_category_buffer.append(entry.getValue() + " " + columnSeparator + " " + entry.getValue() + "\n");
+            file_category_buffer.append(entry.getValue() + " " + columnSeparator + " " + entry.getKey() + "\n");
         }
 
         //Close file/buffer writer
@@ -377,6 +455,57 @@ class MyParser {
         }
 
         //**************************************************************/
+        //********** WRITING TO ITEMS.DAT 
+        //**************************************************************/
+
+        try{
+            FileWriter itemdat = new FileWriter("items.dat");
+            BufferedWriter itemdat_buffer = new BufferedWriter(itemdat);
+
+            //Loop through item set
+            for (Items it : set_items) {
+                //Assign categiry ID with positive hash value
+                itemdat_buffer.append(String.format(
+                    "%s " + columnSeparator + 
+                    " %s " + columnSeparator + 
+                    " %s " + columnSeparator +
+                    " %s " + columnSeparator + 
+                    " %s " + columnSeparator + 
+                    " %s " + columnSeparator + 
+                    " %s " + columnSeparator + 
+                    " %s " + columnSeparator + 
+                    " %s " + columnSeparator + 
+                    " %s " + columnSeparator + 
+                    " %s " + columnSeparator + 
+                    " %s " + columnSeparator + 
+                    " %s " + columnSeparator + 
+                    " %s\n", 
+                    it.item_id,
+                    it.item_name,
+                    it.item_currently,
+                    it.item_buy_price,
+                    it.item_first_bid,
+                    it.item_num_bids,
+                    it.item_location,
+                    it.item_country,
+                    it.item_lon,
+                    it.item_lat,
+                    it.item_started,
+                    it.item_ends,
+                    it.item_description,
+                    it.item_seller_id));
+
+            }
+
+            //Close file/buffer writer
+            itemdat_buffer.close();
+            itemdat.close();
+
+        } catch (IOException e) {
+            System.out.println("ERROR: FileWriter error");
+        }
+
+        //**************************************************************/
         //********** WRITING TO CATEGORY.DAT 
         //**************************************************************/
 
@@ -427,7 +556,6 @@ class MyParser {
         //Close file/buffer writer
         users_buffer.close();
         users.close();
-
 
         } catch (IOException e) {
             System.out.println("ERROR: FileWriter error");
