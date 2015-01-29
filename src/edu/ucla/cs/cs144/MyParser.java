@@ -39,7 +39,6 @@ import org.w3c.dom.Text;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.ErrorHandler;
-import java.text.SimpleDateFormat;
 
 
 class MyParser {
@@ -84,6 +83,22 @@ class MyParser {
         }
         
     }
+
+    /**************************************************************/
+    /**************************************************************/
+    /**************************************************************/
+
+    //Helper classes for organizing the database tables
+
+
+    //Set for the category, using a set to get rid of duplicates
+    static Set<String> set_category = new HashSet<String>();
+
+
+    /**************************************************************/
+    /**************************************************************/
+    /**************************************************************/
+
     
     /* Non-recursive (NR) version of Node.getElementsByTagName(...)
      */
@@ -187,13 +202,60 @@ class MyParser {
         /**************************************************************/
         /* Fill in code here (you will probably need to write auxiliary
             methods). */
-
-
-
-
-
-
         
+        
+        //**************************************************************/
+        //********** ITERATING THROUGH XML DOCUMENTS
+        //**************************************************************/
+
+        Element[] current = getElementsByTagNameNR(doc.getDocumentElement(), "Item");
+
+        // Looping through all Items in XML file
+        for(int i = 0; i < current.length ; i++){
+
+            //Get item id
+            int itemID = Integer.parseInt(current[i].getAttribute("ItemID"));
+
+            //Get Category information, loop through and set category.dat file
+            Element[] categoryXML = getElementsByTagNameNR(current[i], "Category");
+
+
+            for(int cat = 0; cat < categoryXML.length ; cat++){
+
+                set_category.add(getElementText(categoryXML[cat]));
+
+            }
+
+        }
+
+
+        //**************************************************************/
+        //********** WRITING TO CATEGORY.DAT
+        //**************************************************************/
+        try {
+            FileWriter category = new FileWriter("Category.dat");
+            BufferedWriter category_buffer = new BufferedWriter(category);
+
+            //category_id is a value we generate on our own
+            int category_id = 1;
+
+            for (String curr : set_category) {
+                //String categoryEntry= curr.getValue();
+
+                String entrycsv = String.format("%d " + columnSeparator + " %s\n", category_id,curr);
+                category_buffer.append(entrycsv); 
+
+                //Increase our category ID
+                category_id++;
+            }
+
+            //Close file/buffer writer
+            category_buffer.close();
+            category.close();
+
+        } catch (IOException e) {
+            System.out.println("ERROR: Category FileWriter error");
+        }
         
         
         /**************************************************************/
