@@ -18,3 +18,9 @@ INTO TABLE `item`
   first_bid, num_bids, location, country,
   lon, lat, started, ends, description,
   seller_id);
+
+LOAD DATA LOCAL INFILE 'bids.dat'
+INTO TABLE `bid`
+  FIELDS TERMINATED BY ' |*| '
+  LINES TERMINATED BY "\n"
+  (item_id, bidder_id, price, time);
