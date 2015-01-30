@@ -164,7 +164,7 @@ class MyParser {
             icat_cat_id = cat_id;
         }
 
-        /*@Override
+        @Override
         public boolean equals(Object obj){
             return (((Item_Category)obj).icat_item_id + icat_cat_id).equals(this.icat_item_id + this.icat_cat_id);
         }
@@ -172,7 +172,7 @@ class MyParser {
         @Override 
         public int hashCode() { 
             return (icat_item_id + icat_cat_id).hashCode();
-        }*/
+        }
     }
 
     public static class Bids {
@@ -235,7 +235,7 @@ class MyParser {
     static List<Bids> list_bids = new ArrayList<Bids>();
 
     //Hashmap for file-category
-    //static Map<Integer,Integer> map_filecategory = new HashMap<Integer,Integer>(); 
+    static Map<Category,String> map_item_category = new HashMap<Category,String>(); 
 
 
     /**************************************************************/
@@ -405,10 +405,20 @@ class MyParser {
                 //Create our own category_id value
                 category_id = String.valueOf(set_category.size() + 1);
 
+
                 //Create new Category with Cat_ID and category name
                 Category c = new Category(
                             category_id,
                             category_name); 
+                set_category.add(c);
+
+                //Add category -> category ID to map
+                //If already exists, grab category ID
+                if(map_item_category.containsKey(c)){
+                    category_id = map_item_category.get(c);
+                } else { // else add to map
+                    map_item_category.put(c, category_id);
+                }
 
                 //Create new Item Category with item_id and cat_id
                 Item_Category ic = new Item_Category(
@@ -421,6 +431,7 @@ class MyParser {
             // Storing item data into Items class, insert into Items set
             String item_id_string = current[i].getAttribute("ItemID");
             String item_name = getElementTextByTagNameNR(current[i], "Name");
+            
             //Converting to $$ so use strip();
             String item_currently = strip(getElementTextByTagNameNR(current[i], "Currently"));
             String item_buy_price = strip(getElementTextByTagNameNR(current[i], "Buy_Price"));
@@ -431,6 +442,7 @@ class MyParser {
             Element loc = getElementByTagNameNR(current[i], "Location");
             String item_lon = loc.getAttribute("Longitude");
             String item_lat = loc.getAttribute("Latitude");
+
             //Converting to MySQL Datetime 
             String item_started = convertDateTime(getElementTextByTagNameNR(current[i], "Started"));
             String item_ends = convertDateTime(getElementTextByTagNameNR(current[i], "Ends"));
@@ -461,25 +473,9 @@ class MyParser {
 
 
         }
-
-        //**************************************************************/
-        //********** WRITING TO ITEM-CATEGORY.DAT -- NOT WORKING *****/
-        //**************************************************************/
-
-        /*FileWriter file_category = new FileWriter("file-category.dat");
-        BufferedWriter file_category_buffer = new BufferedWriter(file_category);
-
-        for (Map.Entry<Integer, Integer> entry: map_filecategory.entrySet()) {
-            file_category_buffer.append(entry.getValue() + " " + columnSeparator + " " + entry.getKey() + "\n");
-        }
-
-        //Close file/buffer writer
-        file_category_buffer.close();
-        file_category.close(); */
-        
-        
+           
         /**************************************************************/
-        /**************************************************************/
+        /****** DONE PROCESSING FILE
         /**************************************************************/
         
     }
@@ -595,9 +591,6 @@ class MyParser {
             FileWriter category = new FileWriter("category.dat");
             BufferedWriter category_buffer = new BufferedWriter(category);
 
-            //category_id is a value we generate on our own
-            //int category_id = 1;
-
             for (Category c : set_category) {
 
                 //Assign categiry ID with positive hash value
@@ -645,9 +638,6 @@ class MyParser {
         try{
             FileWriter bids = new FileWriter("bids.dat");
             BufferedWriter bids_buffer = new BufferedWriter(bids);
-
-            //category_id is a value we generate on our own
-            //int category_id = 1;
 
             for (Bids bd : list_bids) {
 
