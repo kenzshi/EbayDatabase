@@ -33,6 +33,15 @@ CREATE TABLE `item` (
   CONSTRAINT `item_ibfk_1` FOREIGN KEY (`seller_id`) REFERENCES `user` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+CREATE TABLE `bid` (
+  `item_id` bigint(20) NOT NULL,
+  `bidder_id` varchar(50) NOT NULL,
+  `price` float DEFAULT NULL,
+  `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  KEY `bidder_id` (`bidder_id`),
+  CONSTRAINT `bid_ibfk_1` FOREIGN KEY (`bidder_id`) REFERENCES `user` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
 CREATE TABLE `item_category` (
   `item_id` bigint(20) NOT NULL,
   `category_id` int(11) NOT NULL,
