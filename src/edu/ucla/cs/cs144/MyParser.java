@@ -175,6 +175,20 @@ class MyParser {
         }*/
     }
 
+    public static class Bids {
+        String bid_item_id;
+        String bid_bidder_id;
+        String bid_price;
+        String bid_time;
+
+        Bids(String item_id, String bidder_id, String price, String time){
+            bid_item_id = item_id;
+            bid_bidder_id = bidder_id;
+            bid_price = price;
+            bid_time = time;
+        }
+    }
+
     public static class Users { 
         String user_name;
         String user_location;
@@ -216,6 +230,9 @@ class MyParser {
 
     //Set of Item_Categories
     static Set<Item_Category> set_item_category = new HashSet<Item_Category>();
+
+    //List of Bids
+    static List<Bids> list_bids = new ArrayList<Bids>();
 
     //Hashmap for file-category
     //static Map<Integer,Integer> map_filecategory = new HashMap<Integer,Integer>(); 
@@ -347,7 +364,7 @@ class MyParser {
             Element bids = getElementByTagNameNR(current[i], "Bids");
             Element[] bid = getElementsByTagNameNR(bids, "Bid");
 
-            // Iterate through the bids and find the buyers
+            // Iterate through the bids and find the buyers, and set up the bids
             for (int j=0; j<bid.length; j++) {
                 // Get buyer information
                 Element buyer = getElementByTagNameNR(bid[j], "Bidder");
@@ -359,6 +376,13 @@ class MyParser {
                         getElementTextByTagNameNR(buyer, "Country"));
                 set_users.add(b);
 
+                Bids bds = new Bids(
+                            String.valueOf(item_id), //item_id
+                            buyer.getAttribute("UserID"), //bidder_id
+                            strip(getElementTextByTagNameNR(bid[j], "Amount")), //price
+                            convertDateTime(getElementTextByTagNameNR(bid[j], "Time"))
+                            );
+                list_bids.add(bds);
             }
 
             //Get seller information and add to Users.dat
@@ -385,8 +409,6 @@ class MyParser {
                 Category c = new Category(
                             category_id,
                             category_name); 
-                if (set_category.add(c))
-
 
                 //Create new Item Category with item_id and cat_id
                 Item_Category ic = new Item_Category(
@@ -437,10 +459,11 @@ class MyParser {
                 item_seller_id);
             set_items.add(item_set);
 
+
         }
 
         //**************************************************************/
-        //********** WRITING TO ITEM-CATEGORY.DAT -- NOT WORKING
+        //********** WRITING TO ITEM-CATEGORY.DAT -- NOT WORKING *****/
         //**************************************************************/
 
         /*FileWriter file_category = new FileWriter("file-category.dat");
@@ -615,6 +638,38 @@ class MyParser {
             System.out.println("ERROR: FileWriter error");
         }
 
+        //**************************************************************/
+        //********** WRITING TO BIDS.DAT 
+        //**************************************************************/
+
+        try{
+            FileWriter bids = new FileWriter("bids.dat");
+            BufferedWriter bids_buffer = new BufferedWriter(bids);
+
+            //category_id is a value we generate on our own
+            //int category_id = 1;
+
+            for (Bids bd : list_bids) {
+
+                //Assign categiry ID with positive hash value
+                bids_buffer.append(String.format(
+                            "%s " + columnSeparator + 
+                            " %s " + columnSeparator + 
+                            " %s " + columnSeparator +
+                             " %s\n", 
+                            bd.bid_item_id,
+                            bd.bid_bidder_id,
+                            bd.bid_price,
+                            bd.bid_time));
+            }
+
+        //Close file/buffer writer
+        bids_buffer.close();
+        bids.close();
+
+        } catch (IOException e) {
+            System.out.println("ERROR: FileWriter error");
+        }
 
 
         //**************************************************************/
