@@ -24,3 +24,9 @@ INTO TABLE `bid`
   FIELDS TERMINATED BY ' |*| '
   LINES TERMINATED BY "\n"
   (item_id, bidder_id, price, time);
+
+LOAD DATA LOCAL INFILE 'item_category.dat'
+INTO TABLE `item_category`
+  FIELDS TERMINATED BY ' |*| '
+  LINES TERMINATED BY "\n"
+  (item_id, category_id);
