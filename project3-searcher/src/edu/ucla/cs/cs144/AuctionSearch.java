@@ -34,6 +34,9 @@ import edu.ucla.cs.cs144.SearchRegion;
 import edu.ucla.cs.cs144.SearchResult;
 
 //Custom import to use the Java XML library
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.*;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
@@ -42,9 +45,6 @@ import javax.xml.transform.OutputKeys;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.dom.DOMSource; 
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.ParserConfigurationException;
 import java.text.SimpleDateFormat;
 import java.io.StringWriter;
 
@@ -125,32 +125,42 @@ public class AuctionSearch implements IAuctionSearch {
 			conn = DbManager.getConnection(true);
 
 
-			// If availible, get the Item with the given itemID
+			// Query to get the Item with the given itemID
 			Statement stmt = conn.createStatement();
 			ResultSet result = stmt.executeQuery("SELECT * FROM item WHERE id = " + itemId);
+
+			// Query to get all categories
+            Statement category_stmt = conn.createStatement();
+            ResultSet category_rs = category_stmt.executeQuery("SELECT name FROM category,item_category WHERE item_category.item_id = " + itemId +  " AND item_category.category_id = category.id");
 
 			//Grab first entry and make sure it's not empty
 			result.first();
 			if (result.getRow() != 0){
-				//xml_result += "<Item ItemID=" + itemId + ">\n"; 
 
 				//Referencing http://docs.oracle.com/javase/6/docs/api/javax/xml/parsers/DocumentBuilderFactory.html
 				DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
                 DocumentBuilder builder = factory.newDocumentBuilder();
                 org.w3c.dom.Document doc = builder.newDocument();
 
-                // Set the root to be <Item>
+                // <Item> set up as root
                 Element root = doc.createElement("Item");
                 root.setAttribute("ItemID", itemId);
                 doc.appendChild(root);
-                
-                // Add the name
+
+                // <Name> Add the name
                 Element element_name = doc.createElement("Name");
                 element_name.appendChild(doc.createTextNode(result.getString("Name")));
                 root.appendChild(element_name);
 
 
+                // <Category> Loop through categories
+                Element category_enum;
+                while(category_rs.next()){
 
+                category_enum = doc.createElement("Category");
+                category_enum.appendChild(doc.createTextNode(category_rs.getString("name")));
+                root.appendChild(category_enum);
+                }
 
 
                 //Transforming document into XML http://docs.oracle.com/javase/tutorial/jaxp/xslt/writingDom.html
@@ -170,6 +180,8 @@ public class AuctionSearch implements IAuctionSearch {
 			}
 
 		//Close up files
+			category_stmt.close();
+            category_rs.close();
             stmt.close();
 			result.close();
             conn.close();
@@ -186,6 +198,27 @@ public class AuctionSearch implements IAuctionSearch {
 
 		return xml_result;
 	}
+
+    /* Method converts from MySQL time to XML time format */
+    public static String convertDateTime(String dateString){
+        //Using java.text.SimpleDateFormat to convert date with http://www.cs.ucla.edu/classes/winter15/cs144/projects/java/simpledateformat.html
+
+        String output = "";
+
+    	try {
+        //Defining format of the ebay string and the new converted string
+        SimpleDateFormat ebay_string = new SimpleDateFormat("MMM-dd-yy HH:mm:ss");
+        SimpleDateFormat converted_string = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+ 
+        Date parsed = converted_string.parse(dateString);
+        output = ebay_string.format(parsed);
+        
+        }catch (Exception pe){
+        		System.out.println(pe);
+        	}
+
+        return output;
+    }
 	
 	public String echo(String message) {
 		return message;
