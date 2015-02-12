@@ -50,10 +50,48 @@ public class AuctionSearch implements IAuctionSearch {
          *
          */
 	
+	
+	private IndexSearcher searcher = null;
+    private QueryParser parser = null;
+
 	public SearchResult[] basicSearch(String query, int numResultsToSkip, 
 			int numResultsToReturn) {
 		// TODO: Your code here!
-		return new SearchResult[0];
+		// Code for Part A below
+
+		/****************************************************
+     		Following tutorial code provided by 
+     		http://www.cs.ucla.edu/classes/winter15/cs144/projects/lucene/index.html
+    	****************************************************/
+
+		SearchResult[] results = null;
+		try{ //Set up trycatch for IOException and ParseException
+			//Set up our Lucene index
+			searcher = new IndexSearcher(DirectoryReader.open(FSDirectory.open(new File("/var/lib/lucene/index1/"))));
+	        parser = new QueryParser("union", new StandardAnalyzer());
+
+	        Query queryString = parser.parse(query);
+
+	        //Now search through our index
+	        int totalResults = numResultsToSkip + numResultsToReturn;
+			TopDocs topDocs = searcher.search(queryString, totalResults); 
+
+			ScoreDoc[] hits = topDocs.scoreDocs;
+			//Create a SearchResult array, initialize size to the number of hits minus the results we want to skip
+			results = new SearchResult[hits.length - numResultsToSkip];
+
+			// loop through the results starting at the results we want to skip
+			for (int i = numResultsToSkip; i < hits.length; i++) {
+			    Document doc = searcher.doc(hits[i].doc);
+			    results[i - numResultsToSkip] = new SearchResult(doc.get("id"),doc.get("name"));;
+			}
+		} catch (IOException e) { 
+            	System.out.println(e);
+        	} catch (ParseException pe){
+        		System.out.println(pe);
+        	}
+
+        return results;
 	}
 
 	public SearchResult[] spatialSearch(String query, SearchRegion region,
