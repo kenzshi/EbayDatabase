@@ -346,20 +346,19 @@ public class AuctionSearch implements IAuctionSearch {
         .replaceAll("\'", "&apos;");*/
 
         //New hacky code to prevent the automatic XML from changing & to &amp;
-        String escaped_str = s.replaceAll("<", "HACKYLESSTHANREPLACEPLEASE")
-        .replaceAll(">", "HACKYGREATERTHANREPLACEPLEASE")
-        .replaceAll("\"", "HACKYQUOTETOREPLACEHERE")
-        .replaceAll("\'", "HACKYAPOSTOREPLACEHERE");
+        String escaped_str = s.replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt")
+        .replaceAll("\"", "quot;")
+        .replaceAll("\'", "&apos;");
 
         return escaped_str;
     }
 
     public static String hackyEscape(String s) {
       	// HACKY SOLUTION TO THE & PROBLEM
-        String hackyesc_str = s.replaceAll("HACKYLESSTHANREPLACEPLEASE", "&lt;")
-        .replaceAll("HACKYGREATERTHANREPLACEPLEASE", "&gt;")
-        .replaceAll("HACKYQUOTETOREPLACEHERE", "quot;")
-        .replaceAll("HACKYAPOSTOREPLACEHERE", "&apos;");
+        String hackyesc_str = s.replaceAll("&amp;lt;", "&lt;")
+        .replaceAll("&amp;gt;", "&gt;")
+        .replaceAll("&amp;apos;", "&apos;");
 
         return hackyesc_str;
     }
