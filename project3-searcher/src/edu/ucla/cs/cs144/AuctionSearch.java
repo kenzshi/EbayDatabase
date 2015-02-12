@@ -132,6 +132,14 @@ public class AuctionSearch implements IAuctionSearch {
 			// Query to get all categories
             Statement category_stmt = conn.createStatement();
             ResultSet category_rs = category_stmt.executeQuery("SELECT name FROM category,item_category WHERE item_category.item_id = " + itemId +  " AND item_category.category_id = category.id");
+            // Query to get all the bids
+            Statement bids_stmt = conn.createStatement();
+            ResultSet bids_rs = bids_stmt.executeQuery("SELECT item_id, bidder_id, price, time, rating, location, country FROM bid, user WHERE bid.item_id = " + itemId + " AND bid.bidder_id = user.id");
+
+            // Query to get seller information
+            Statement seller_stmt = conn.createStatement();
+            ResultSet seller_rs = seller_stmt.executeQuery("SELECT user.id, rating, user.location, user.country FROM item, user where item.id = " + itemId + " AND item.seller_id = user.id");
+
 
 			//Grab first entry and make sure it's not empty
 			result.first();
@@ -179,6 +187,87 @@ public class AuctionSearch implements IAuctionSearch {
                 first_bid.appendChild(doc.createTextNode("$" + result.getString("first_bid")));
                 root.appendChild(first_bid);
 
+                // <Number_of_Bids> 
+                Element num_bids = doc.createElement("Number_of_Bids");
+                num_bids.appendChild(doc.createTextNode(escapeChars(result.getString("num_bids"))));
+				root.appendChild(num_bids);
+
+				// <Bids> 
+				Element bids_element = doc.createElement("Bids");
+				while(bids_rs.next()){
+					// <Bid> becomes the new root in this loop
+					Element bid_element = doc.createElement("Bid");
+
+					// OPENS <Bidder Rating="" UserID=""
+					Element bidder = doc.createElement("Bidder");
+					bidder.setAttribute("Rating", escapeChars(bids_rs.getString("rating")));
+					bidder.setAttribute("UserID", escapeChars(bids_rs.getString("bidder_id")));
+
+					// <Location> 
+					Element bid_location = doc.createElement("Location");
+                	bid_location.appendChild(doc.createTextNode(escapeChars(bids_rs.getString("location"))));
+					bidder.appendChild(bid_location);
+
+					// <Country> 
+					Element bid_country = doc.createElement("Country");
+                	bid_country.appendChild(doc.createTextNode(escapeChars(bids_rs.getString("country"))));
+					bidder.appendChild(bid_country);
+					// CLOSES </Bidder>
+					bid_element.appendChild(bidder);
+
+					// <Time> CONVERT TIME TO XML from MySQL time
+					Element bid_time = doc.createElement("Time");
+                    bid_time.appendChild(doc.createTextNode(convertDateTime(bids_rs.getString("time"))));
+                    bid_element.appendChild(bid_time);
+
+                    // <Amount> 
+                    Element bid_amount = doc.createElement("Amount");
+                    bid_amount.appendChild(doc.createTextNode("$" + bids_rs.getString("price")));
+                    bid_element.appendChild(bid_amount);
+
+					// Closes <Bid>
+					bids_element.appendChild(bid_element);
+				}
+				
+				// Close </Bids>
+				root.appendChild(bids_element);
+
+				// Get Seller information/location/country/etc
+				seller_rs.first();
+				
+				// <Location>
+				Element seller_location = doc.createElement("Location");
+                seller_location.appendChild(doc.createTextNode(escapeChars(seller_rs.getString("user.location"))));
+				root.appendChild(seller_location);
+
+				// <Country>
+				Element seller_country = doc.createElement("Country");
+                seller_country.appendChild(doc.createTextNode(escapeChars(seller_rs.getString("user.country"))));
+				root.appendChild(seller_country);
+
+				// <Started>
+				Element started = doc.createElement("Started");
+                started.appendChild(doc.createTextNode(convertDateTime(result.getString("started"))));
+				root.appendChild(started);
+
+				// <Ends>
+				Element ends = doc.createElement("Ends");
+                ends.appendChild(doc.createTextNode(convertDateTime(result.getString("ends"))));
+				root.appendChild(ends);
+
+				// <Seller>
+				Element seller = doc.createElement("Seller");
+                seller.setAttribute("UserID", escapeChars(seller_rs.getString("user.id")));
+                seller.setAttribute("Rating", seller_rs.getString("rating"));
+                root.appendChild(seller);
+
+                // <Description>
+                Element description = doc.createElement("Description");
+                description.appendChild(doc.createTextNode(escapeChars(result.getString("description"))));
+                root.appendChild(description);
+
+                /****FINISHED BUILDING XML DOM, TRANSFORMING NOW****/
+
                 //Transforming document into XML http://docs.oracle.com/javase/tutorial/jaxp/xslt/writingDom.html
                 TransformerFactory tFactory = TransformerFactory.newInstance();
     			Transformer transformer = tFactory.newTransformer();
@@ -188,6 +277,7 @@ public class AuctionSearch implements IAuctionSearch {
     			StreamResult stm_result = new StreamResult(str_writer);
     			transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes"); //Get rid of the XML declaration in the beginning
     			transformer.setOutputProperty(OutputKeys.INDENT, "yes"); //we want indents
+    			transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4"); //amount is 4 based off of stackoverflow article http://stackoverflow.com/questions/4850901/formatting-xml-file-indentation
     			transformer.transform(source, stm_result);
     			xml_result = str_writer.toString(); //Transform to our XML string
 
@@ -196,10 +286,18 @@ public class AuctionSearch implements IAuctionSearch {
 			}
 
 		//Close up files
+			seller_stmt.close();
+			seller_rs.close();
+
+			bids_stmt.close();
+            bids_rs.close();
+
 			category_stmt.close();
             category_rs.close();
+
             stmt.close();
 			result.close();
+
             conn.close();
 
 		} catch (SQLException ex) {
@@ -239,12 +337,13 @@ public class AuctionSearch implements IAuctionSearch {
     public static String escapeChars(String s) {
       	// Escapes all the characters 
       	// Based off of http://www.hdfgroup.org/HDF5/XML/xml_escape_chars.htm
-        s.replaceAll("&", "&amp;");
-        s.replaceAll("<", "&lt;");
-        s.replaceAll(">", "&gt;");
-        s.replaceAll("\"", "quot;"); 
-        s.replaceAll("\'", "&apos;");
-        return s;
+    	// &amp; is already escaped
+        String escaped_str = s.replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll("\"", "quot;")
+        .replaceAll("\'", "&apos;");
+
+        return escaped_str;
     }
 	
 	public String echo(String message) {

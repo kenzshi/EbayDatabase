@@ -44,8 +44,9 @@ public class AuctionSearchTest {
 		for(SearchResult result : spatialResults) {
 			System.out.println(result.getItemId() + ": " + result.getName());
 		}
-		//1497595357
-		String itemId = "1043608482";
+		//1497595357 Original value
+		//1045678297 Needs Description to escape
+		String itemId = "1045678297";
 		String item = as.getXMLDataForItemId(itemId);
 		System.out.println("XML data for ItemId: " + itemId);
 		System.out.println(item);
