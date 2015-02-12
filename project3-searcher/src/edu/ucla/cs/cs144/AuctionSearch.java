@@ -33,6 +33,21 @@ import edu.ucla.cs.cs144.DbManager;
 import edu.ucla.cs.cs144.SearchRegion;
 import edu.ucla.cs.cs144.SearchResult;
 
+//Custom import to use the Java XML library
+import org.w3c.dom.*;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.dom.DOMSource; 
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.ParserConfigurationException;
+import java.text.SimpleDateFormat;
+import java.io.StringWriter;
+
 public class AuctionSearch implements IAuctionSearch {
 
 	/* 
@@ -62,7 +77,7 @@ public class AuctionSearch implements IAuctionSearch {
 		/****************************************************
      		Following tutorial code provided by 
      		http://www.cs.ucla.edu/classes/winter15/cs144/projects/lucene/index.html
-    	****************************************************/
+		****************************************************/
 
 		SearchResult[] results = null;
 		try{ //Set up trycatch for IOException and ParseException
@@ -102,7 +117,74 @@ public class AuctionSearch implements IAuctionSearch {
 
 	public String getXMLDataForItemId(String itemId) {
 		// TODO: Your code here!
-		return "";
+		String xml_result = "";
+
+		//Open up DB connection
+		Connection conn = null;
+		try{
+			conn = DbManager.getConnection(true);
+
+
+			// If availible, get the Item with the given itemID
+			Statement stmt = conn.createStatement();
+			ResultSet result = stmt.executeQuery("SELECT * FROM item WHERE id = " + itemId);
+
+			//Grab first entry and make sure it's not empty
+			result.first();
+			if (result.getRow() != 0){
+				//xml_result += "<Item ItemID=" + itemId + ">\n"; 
+
+				//Referencing http://docs.oracle.com/javase/6/docs/api/javax/xml/parsers/DocumentBuilderFactory.html
+				DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                DocumentBuilder builder = factory.newDocumentBuilder();
+                org.w3c.dom.Document doc = builder.newDocument();
+
+                // Set the root to be <Item>
+                Element root = doc.createElement("Item");
+                root.setAttribute("ItemID", itemId);
+                doc.appendChild(root);
+                
+                // Add the name
+                Element element_name = doc.createElement("Name");
+                element_name.appendChild(doc.createTextNode(result.getString("Name")));
+                root.appendChild(element_name);
+
+
+
+
+
+                //Transforming document into XML http://docs.oracle.com/javase/tutorial/jaxp/xslt/writingDom.html
+                TransformerFactory tFactory = TransformerFactory.newInstance();
+    			Transformer transformer = tFactory.newTransformer();
+
+    			DOMSource source = new DOMSource(doc);
+    			StringWriter str_writer = new StringWriter();
+    			StreamResult stm_result = new StreamResult(str_writer);
+    			transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes"); //Get rid of the XML declaration in the beginning
+    			transformer.setOutputProperty(OutputKeys.INDENT, "yes"); //we want indents
+    			transformer.transform(source, stm_result);
+    			xml_result = str_writer.toString(); //Transform to our XML string
+
+			} else { //Else if unable to find the item ID, return empty string
+				xml_result = "";
+			}
+
+		//Close up files
+            stmt.close();
+			result.close();
+            conn.close();
+
+		} catch (SQLException ex) {
+		    System.out.println(ex);
+		} catch (TransformerConfigurationException tce){
+			System.out.println(tce);
+		} catch (ParserConfigurationException pce){
+			System.out.println(pce);
+		} catch (TransformerException te){
+			System.out.println(te);
+		}
+
+		return xml_result;
 	}
 	
 	public String echo(String message) {
