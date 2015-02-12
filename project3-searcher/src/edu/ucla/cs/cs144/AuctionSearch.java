@@ -48,6 +48,7 @@ import javax.xml.transform.stream.StreamResult;
 import java.text.SimpleDateFormat;
 import java.io.StringWriter;
 
+
 public class AuctionSearch implements IAuctionSearch {
 
 	/* 
@@ -279,7 +280,7 @@ public class AuctionSearch implements IAuctionSearch {
     			transformer.setOutputProperty(OutputKeys.INDENT, "yes"); //we want indents
     			transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4"); //amount is 4 based off of stackoverflow article http://stackoverflow.com/questions/4850901/formatting-xml-file-indentation
     			transformer.transform(source, stm_result);
-    			xml_result = str_writer.toString(); //Transform to our XML string
+    			xml_result = hackyEscape(str_writer.toString()); //Transform to our XML string
 
 			} else { //Else if unable to find the item ID, return empty string
 				xml_result = "";
@@ -338,12 +339,29 @@ public class AuctionSearch implements IAuctionSearch {
       	// Escapes all the characters 
       	// Based off of http://www.hdfgroup.org/HDF5/XML/xml_escape_chars.htm
     	// &amp; is already escaped
+    	/* Previous code
         String escaped_str = s.replaceAll("<", "&lt;")
         .replaceAll(">", "&gt;")
         .replaceAll("\"", "quot;")
-        .replaceAll("\'", "&apos;");
+        .replaceAll("\'", "&apos;");*/
+
+        //New hacky code to prevent the automatic XML from changing & to &amp;
+        String escaped_str = s.replaceAll("<", "HACKYLESSTHANREPLACEPLEASE")
+        .replaceAll(">", "HACKYGREATERTHANREPLACEPLEASE")
+        .replaceAll("\"", "HACKYQUOTETOREPLACEHERE")
+        .replaceAll("\'", "HACKYAPOSTOREPLACEHERE");
 
         return escaped_str;
+    }
+
+    public static String hackyEscape(String s) {
+      	// HACKY SOLUTION TO THE & PROBLEM
+        String hackyesc_str = s.replaceAll("HACKYLESSTHANREPLACEPLEASE", "&lt;")
+        .replaceAll("HACKYGREATERTHANREPLACEPLEASE", "&gt;")
+        .replaceAll("HACKYQUOTETOREPLACEHERE", "quot;")
+        .replaceAll("HACKYAPOSTOREPLACEHERE", "&apos;");
+
+        return hackyesc_str;
     }
 	
 	public String echo(String message) {
