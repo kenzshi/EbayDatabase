@@ -339,13 +339,7 @@ public class AuctionSearch implements IAuctionSearch {
       	// Escapes all the characters 
       	// Based off of http://www.hdfgroup.org/HDF5/XML/xml_escape_chars.htm
     	// &amp; is already escaped
-    	/* Previous code
-        String escaped_str = s.replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll("\"", "quot;")
-        .replaceAll("\'", "&apos;");*/
-
-        //New hacky code to prevent the automatic XML from changing & to &amp;
+    	// This leads to values like &amp;lt; &amp;gt; &amp;apos;
         String escaped_str = s.replaceAll("<", "&lt;")
         .replaceAll(">", "&gt")
         .replaceAll("\"", "quot;")
@@ -355,7 +349,7 @@ public class AuctionSearch implements IAuctionSearch {
     }
 
     public static String hackyEscape(String s) {
-      	// HACKY SOLUTION TO THE & PROBLEM
+      	// HACKY SOLUTION TO THE & ESCAPE PROBLEM
         String hackyesc_str = s.replaceAll("&amp;lt;", "&lt;")
         .replaceAll("&amp;gt;", "&gt;")
         .replaceAll("&amp;apos;", "&apos;");
