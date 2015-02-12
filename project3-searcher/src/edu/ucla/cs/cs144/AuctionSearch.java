@@ -149,7 +149,7 @@ public class AuctionSearch implements IAuctionSearch {
 
                 // <Name> Add the name
                 Element element_name = doc.createElement("Name");
-                element_name.appendChild(doc.createTextNode(result.getString("Name")));
+                element_name.appendChild(doc.createTextNode(escapeChars(result.getString("name"))));
                 root.appendChild(element_name);
 
 
@@ -158,10 +158,26 @@ public class AuctionSearch implements IAuctionSearch {
                 while(category_rs.next()){
 
                 category_enum = doc.createElement("Category");
-                category_enum.appendChild(doc.createTextNode(category_rs.getString("name")));
+                category_enum.appendChild(doc.createTextNode(escapeChars(category_rs.getString("name"))));
                 root.appendChild(category_enum);
                 }
 
+                // <Currently> Adding the current price
+                Element currently = doc.createElement("Currently");
+                currently.appendChild(doc.createTextNode("$" + result.getString("currently")));
+                root.appendChild(currently);
+
+                // <Buy_Price> If availible
+                if (result.getString("Buy_Price") != null) {
+                    Element buy_price = doc.createElement("Buy_Price");
+                    buy_price.appendChild(doc.createTextNode("$" + result.getString("buy_price")));
+                    root.appendChild(buy_price);
+                }
+
+                // <First_Bid> Get the first bid
+                Element first_bid = doc.createElement("First_Bid");
+                first_bid.appendChild(doc.createTextNode("$" + result.getString("first_bid")));
+                root.appendChild(first_bid);
 
                 //Transforming document into XML http://docs.oracle.com/javase/tutorial/jaxp/xslt/writingDom.html
                 TransformerFactory tFactory = TransformerFactory.newInstance();
@@ -218,6 +234,17 @@ public class AuctionSearch implements IAuctionSearch {
         	}
 
         return output;
+    }
+
+    public static String escapeChars(String s) {
+      	// Escapes all the characters 
+      	// Based off of http://www.hdfgroup.org/HDF5/XML/xml_escape_chars.htm
+        s.replaceAll("&", "&amp;");
+        s.replaceAll("<", "&lt;");
+        s.replaceAll(">", "&gt;");
+        s.replaceAll("\"", "quot;"); 
+        s.replaceAll("\'", "&apos;");
+        return s;
     }
 	
 	public String echo(String message) {
