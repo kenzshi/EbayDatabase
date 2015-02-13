@@ -120,6 +120,8 @@ public class AuctionSearch implements IAuctionSearch {
 		HashMap<String, String> sqlResults = new HashMap<String, String>();
 		Connection conn = null;
 
+		List<SearchResult> combinedResults = new ArrayList<SearchResult>();
+
 		try {
             conn = DbManager.getConnection(true);
 			Statement stmt = conn.createStatement();
@@ -141,12 +143,18 @@ public class AuctionSearch implements IAuctionSearch {
 					// sqlResults.put(result.getString("ItemID"), result.getString("Name"));
                 System.out.println(result.getString("ItemID"));
 			}
+
+			for (int i = 0; i < basicResults.length; i++) {
+				if (sqlResults.get(basicResults[i].getItemId())) {
+					combinedResults.add(basicResults[i]);
+				}
+			}
 		}
          catch (SQLException ex) {
             System.out.println(ex);
         }
-					
-		return basicResults;
+
+		return combinedResults.toArray();
 	}
 
 	public String getXMLDataForItemId(String itemId) {
