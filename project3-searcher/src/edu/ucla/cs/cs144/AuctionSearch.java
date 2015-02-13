@@ -137,9 +137,13 @@ public class AuctionSearch implements IAuctionSearch {
 			while(result.next()) {
 					sqlResults.put(result.getString("ItemID"), result.getString("Name"));
 			}
-		}
-
-		return result;
+		} catch (IOException e) {
+            	System.out.println(e);
+        	} catch (ParseException pe){
+        		System.out.println(pe);
+        	}
+					
+		return ;
 	}
 
 	public String getXMLDataForItemId(String itemId) {
