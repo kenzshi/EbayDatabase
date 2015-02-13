@@ -23,5 +23,7 @@ http://docs.oracle.com/javase/6/docs/api/javax/xml/parsers/DocumentBuilderFactor
 
 (2) In creating the XML from itemID, we decided to use the Java XML DOM library to enforce better programming and make it easier for us to keep track of all the nodes. It automatically creates the < > tags that we need, and also takes care of indentations. 
 
+(3) When deploying our code to the server, we ran the command ((ant build && cp build/AuctionSearchService.aar $CATALINA_BASE/webapps/axis2/WEB-INF/services/) && echo "Deploy Successful!") || echo "Deploy Failed!", which would echo Deploy Successful if we were able to copy our AuctionSearchService.aar to the Axis2 server. 
+
 Issues:
 - One of the big issues is that the Java XML lib we used automatically escapes & into &amp;. This made it very difficult to escape characters like < to &lt; because the library sees the & and transforms it into &amp;lt. We had a hacky solution to this by calling replaceAll on the final XML string to replace &amp;lt; &amp;gt; &amp;apos; to their original &lt, &gt and &apos values.
