@@ -43,7 +43,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.dom.DOMSource; 
+import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.text.SimpleDateFormat;
 import java.io.StringWriter;
@@ -51,7 +51,7 @@ import java.io.StringWriter;
 
 public class AuctionSearch implements IAuctionSearch {
 
-	/* 
+	/*
          * You will probably have to use JDBC to access MySQL data
          * Lucene IndexSearcher class to lookup Lucene index.
          * Read the corresponding tutorial to learn about how to use these.
@@ -65,18 +65,18 @@ public class AuctionSearch implements IAuctionSearch {
          * placed at src/edu/ucla/cs/cs144.
          *
          */
-	
-	
+
+
 	private IndexSearcher searcher = null;
     private QueryParser parser = null;
 
-	public SearchResult[] basicSearch(String query, int numResultsToSkip, 
+	public SearchResult[] basicSearch(String query, int numResultsToSkip,
 			int numResultsToReturn) {
 		// TODO: Your code here!
 		// Code for Part A below
 
 		/****************************************************
-     		Following tutorial code provided by 
+     		Following tutorial code provided by
      		http://www.cs.ucla.edu/classes/winter15/cs144/projects/lucene/index.html
 		****************************************************/
 
@@ -90,7 +90,7 @@ public class AuctionSearch implements IAuctionSearch {
 
 	        //Now search through our index
 	        int totalResults = numResultsToSkip + numResultsToReturn;
-			TopDocs topDocs = searcher.search(queryString, totalResults); 
+			TopDocs topDocs = searcher.search(queryString, totalResults);
 
 			ScoreDoc[] hits = topDocs.scoreDocs;
 			//Create a SearchResult array, initialize size to the number of hits minus the results we want to skip
@@ -101,7 +101,7 @@ public class AuctionSearch implements IAuctionSearch {
 			    Document doc = searcher.doc(hits[i].doc);
 			    results[i - numResultsToSkip] = new SearchResult(doc.get("id"),doc.get("name"));;
 			}
-		} catch (IOException e) { 
+		} catch (IOException e) {
             	System.out.println(e);
         	} catch (ParseException pe){
         		System.out.println(pe);
@@ -113,7 +113,33 @@ public class AuctionSearch implements IAuctionSearch {
 	public SearchResult[] spatialSearch(String query, SearchRegion region,
 			int numResultsToSkip, int numResultsToReturn) {
 		// TODO: Your code here!
-		return new SearchResult[0];
+
+		SearchResult[] basicResults = basicSearch(query, 0, 20000);
+
+		Map<String, String> sqlResults = new HashMap<String, String>();
+		Connection conn = null;
+
+		try {
+			Statement stmt = conn.createStatement();
+
+			String select = "SELECT id FROM spatial_item WHERE";
+			select += "MBRCONTAINS(GEOMFROMTEXT('POLYGON((";
+			select += String.valueOf(region.getLx()) + " " + String.valueOf(region.getLy()) + ", ";
+			select += String.valueOf(region.getRx()) + " " + String.valueOf(region.getLy()) + ", ";
+			select += String.valueOf(region.getRx()) + " " + String.valueOf(region.getRy()) + ", ";
+			select += String.valueOf(region.getLx()) + " " + String.valueOf(region.getRy()) + ", ";
+			select += String.valueOf(region.getLx()) + " " + String.valueOf(region.getLy());
+			select += ")'), pt);"
+
+			ResultSet result = stmt.executeQuery(select);
+
+			// loop through the results starting at the results we want to skip
+			while(result.next()) {
+					sqlResults.put(result.getString("ItemID"), result.getString("Name"));
+			}
+		}
+
+		return result;
 	}
 
 	public String getXMLDataForItemId(String itemId) {
@@ -188,12 +214,12 @@ public class AuctionSearch implements IAuctionSearch {
                 first_bid.appendChild(doc.createTextNode("$" + result.getString("first_bid")));
                 root.appendChild(first_bid);
 
-                // <Number_of_Bids> 
+                // <Number_of_Bids>
                 Element num_bids = doc.createElement("Number_of_Bids");
                 num_bids.appendChild(doc.createTextNode(escapeChars(result.getString("num_bids"))));
 				root.appendChild(num_bids);
 
-				// <Bids> 
+				// <Bids>
 				Element bids_element = doc.createElement("Bids");
 				while(bids_rs.next()){
 					// <Bid> becomes the new root in this loop
@@ -204,12 +230,12 @@ public class AuctionSearch implements IAuctionSearch {
 					bidder.setAttribute("Rating", escapeChars(bids_rs.getString("rating")));
 					bidder.setAttribute("UserID", escapeChars(bids_rs.getString("bidder_id")));
 
-					// <Location> 
+					// <Location>
 					Element bid_location = doc.createElement("Location");
                 	bid_location.appendChild(doc.createTextNode(escapeChars(bids_rs.getString("location"))));
 					bidder.appendChild(bid_location);
 
-					// <Country> 
+					// <Country>
 					Element bid_country = doc.createElement("Country");
                 	bid_country.appendChild(doc.createTextNode(escapeChars(bids_rs.getString("country"))));
 					bidder.appendChild(bid_country);
@@ -221,7 +247,7 @@ public class AuctionSearch implements IAuctionSearch {
                     bid_time.appendChild(doc.createTextNode(convertDateTime(bids_rs.getString("time"))));
                     bid_element.appendChild(bid_time);
 
-                    // <Amount> 
+                    // <Amount>
                     Element bid_amount = doc.createElement("Amount");
                     bid_amount.appendChild(doc.createTextNode("$" + bids_rs.getString("price")));
                     bid_element.appendChild(bid_amount);
@@ -229,13 +255,13 @@ public class AuctionSearch implements IAuctionSearch {
 					// Closes <Bid>
 					bids_element.appendChild(bid_element);
 				}
-				
+
 				// Close </Bids>
 				root.appendChild(bids_element);
 
 				// Get Seller information/location/country/etc
 				seller_rs.first();
-				
+
 				// <Location>
 				Element seller_location = doc.createElement("Location");
                 seller_location.appendChild(doc.createTextNode(escapeChars(seller_rs.getString("user.location"))));
@@ -328,10 +354,10 @@ public class AuctionSearch implements IAuctionSearch {
         //Defining format of the ebay string and the new converted string
         SimpleDateFormat ebay_string = new SimpleDateFormat("MMM-dd-yy HH:mm:ss");
         SimpleDateFormat converted_string = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
- 
+
         Date parsed = converted_string.parse(dateString);
         output = ebay_string.format(parsed);
-        
+
         }catch (Exception pe){
         		System.out.println(pe);
         	}
@@ -340,7 +366,7 @@ public class AuctionSearch implements IAuctionSearch {
     }
 
     public static String escapeChars(String s) {
-      	// Escapes all the characters 
+      	// Escapes all the characters
       	// Based off of http://www.hdfgroup.org/HDF5/XML/xml_escape_chars.htm
     	// &amp; is already escaped
     	// This leads to values like &amp;lt; &amp;gt; &amp;apos;
@@ -360,7 +386,7 @@ public class AuctionSearch implements IAuctionSearch {
 
         return hackyesc_str;
     }
-	
+
 	public String echo(String message) {
 		return message;
 	}
