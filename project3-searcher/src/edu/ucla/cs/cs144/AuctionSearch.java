@@ -136,7 +136,6 @@ public class AuctionSearch implements IAuctionSearch {
 			select += "))'), GeomFromText(AsText(pt)));";
 
 			ResultSet result = stmt.executeQuery(select);
-            System.out.println(select);
 
 			// loop through the results starting at the results we want to skip
 			while(result.next()) {
@@ -144,9 +143,7 @@ public class AuctionSearch implements IAuctionSearch {
 			}
 
 			for (int i = 0; i < basicResults.length; i++) {
-				System.out.println(basicResults[i].getItemId());
 				if (sqlResults.get(basicResults[i].getItemId()) != null) {
-					System.out.println(basicResults[i].getItemId());
 					combinedResults.add(basicResults[i]);
 				}
 			}
