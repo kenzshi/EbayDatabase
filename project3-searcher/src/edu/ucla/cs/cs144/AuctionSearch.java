@@ -100,7 +100,7 @@ public class AuctionSearch implements IAuctionSearch {
 			// loop through the results starting at the results we want to skip
 			for (int i = numResultsToSkip; i < hits.length; i++) {
 			    Document doc = searcher.doc(hits[i].doc);
-			    results[i - numResultsToSkip] = new SearchResult(doc.get("id"),doc.get("name"));;
+			    results[i - numResultsToSkip] = new SearchResult(doc.get("ItemID"),doc.get("Name"));;
 			}
 		} catch (IOException e) {
             	System.out.println(e);
@@ -150,9 +150,9 @@ public class AuctionSearch implements IAuctionSearch {
 				}
 			}
 		}
-         catch (SQLException ex) {
-            System.out.println(ex);
-        }
+	  catch (SQLException ex) {
+	      System.out.println(ex);
+	  }
 
 		return combinedResults.toArray(new SearchResult[combinedResults.size()]);
 	}
