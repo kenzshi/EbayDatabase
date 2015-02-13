@@ -47,6 +47,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.text.SimpleDateFormat;
 import java.io.StringWriter;
+import java.util.HashMap;
 
 
 public class AuctionSearch implements IAuctionSearch {
@@ -116,20 +117,23 @@ public class AuctionSearch implements IAuctionSearch {
 
 		SearchResult[] basicResults = basicSearch(query, 0, 20000);
 
-		Map<String, String> sqlResults = new HashMap<String, String>();
+		HashMap<String, String> sqlResults = new HashMap<String, String>();
 		Connection conn = null;
 
 		try {
+            conn = DbManager.getConnection(true);
 			Statement stmt = conn.createStatement();
 
-			String select = "SELECT id FROM spatial_item WHERE";
+			String select = "SELECT id FROM spatial_item WHERE ";
 			select += "MBRCONTAINS(GEOMFROMTEXT('POLYGON((";
 			select += String.valueOf(region.getLx()) + " " + String.valueOf(region.getLy()) + ", ";
 			select += String.valueOf(region.getRx()) + " " + String.valueOf(region.getLy()) + ", ";
 			select += String.valueOf(region.getRx()) + " " + String.valueOf(region.getRy()) + ", ";
 			select += String.valueOf(region.getLx()) + " " + String.valueOf(region.getRy()) + ", ";
 			select += String.valueOf(region.getLx()) + " " + String.valueOf(region.getLy());
-			select += ")'), pt);"
+			select += ")'), pt);";
+
+            System.out.println(select);
 
 			ResultSet result = stmt.executeQuery(select);
 
@@ -137,13 +141,12 @@ public class AuctionSearch implements IAuctionSearch {
 			while(result.next()) {
 					sqlResults.put(result.getString("ItemID"), result.getString("Name"));
 			}
-		} catch (IOException e) {
-            	System.out.println(e);
-        	} catch (ParseException pe){
-        		System.out.println(pe);
-        	}
+		}
+         catch (SQLException ex) {
+            System.out.println(ex);
+        }
 					
-		return ;
+		return basicResults;
 	}
 
 	public String getXMLDataForItemId(String itemId) {
