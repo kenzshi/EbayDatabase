@@ -46,7 +46,7 @@ public class AuctionSearchTest {
 		}
 		//1497595357 Original value
 		//1045678297 Needs Description to escape
-		String itemId = "1045678297";
+		String itemId = "1043817906";
 		String item = as.getXMLDataForItemId(itemId);
 		System.out.println("XML data for ItemId: " + itemId);
 		System.out.println(item);

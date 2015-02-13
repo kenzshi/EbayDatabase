@@ -139,7 +139,7 @@ public class AuctionSearch implements IAuctionSearch {
 
             // Query to get seller information
             Statement seller_stmt = conn.createStatement();
-            ResultSet seller_rs = seller_stmt.executeQuery("SELECT user.id, rating, user.location, user.country FROM item, user where item.id = " + itemId + " AND item.seller_id = user.id");
+            ResultSet seller_rs = seller_stmt.executeQuery("SELECT user.id, rating, user.location, user.country, lat, lon FROM item, user where item.id = " + itemId + " AND item.seller_id = user.id");
 
 
 			//Grab first entry and make sure it's not empty
@@ -239,6 +239,10 @@ public class AuctionSearch implements IAuctionSearch {
 				// <Location>
 				Element seller_location = doc.createElement("Location");
                 seller_location.appendChild(doc.createTextNode(escapeChars(seller_rs.getString("user.location"))));
+                if(!seller_rs.getString("lat").equals("0")){ //If Lat/Lon fields aren't empty
+                seller_location.setAttribute("Latitude", escapeChars(seller_rs.getString("lat")));
+                seller_location.setAttribute("Longitude", escapeChars(seller_rs.getString("lon")));
+                }
 				root.appendChild(seller_location);
 
 				// <Country>
