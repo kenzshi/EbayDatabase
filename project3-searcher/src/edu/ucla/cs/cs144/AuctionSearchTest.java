@@ -32,7 +32,7 @@ public class AuctionSearchTest {
 		System.out.println("Received " + basicResults3.length + " results");
 
 
-		for(SearchResult result : basicResults) {
+		for(SearchResult result : basicResults3) {
 			System.out.println(result.getItemId() + ": " + result.getName());
 		}
 
