@@ -141,7 +141,6 @@ public class AuctionSearch implements IAuctionSearch {
 			// loop through the results starting at the results we want to skip
 			while(result.next()) {
 					sqlResults.put(result.getString("id"), result.getString("name"));
-          System.out.println(result.getString("ItemID"));
 			}
 
 			for (int i = 0; i < basicResults.length; i++) {
