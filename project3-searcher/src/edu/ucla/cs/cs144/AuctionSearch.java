@@ -125,21 +125,21 @@ public class AuctionSearch implements IAuctionSearch {
 			Statement stmt = conn.createStatement();
 
 			String select = "SELECT id FROM spatial_item WHERE ";
-			select += "MBRCONTAINS(GEOMFROMTEXT('POLYGON((";
+			select += "MBRContains(GeomFromText('Polygon((";
 			select += String.valueOf(region.getLx()) + " " + String.valueOf(region.getLy()) + ", ";
-			select += String.valueOf(region.getRx()) + " " + String.valueOf(region.getLy()) + ", ";
-			select += String.valueOf(region.getRx()) + " " + String.valueOf(region.getRy()) + ", ";
 			select += String.valueOf(region.getLx()) + " " + String.valueOf(region.getRy()) + ", ";
+			select += String.valueOf(region.getRx()) + " " + String.valueOf(region.getRy()) + ", ";
+			select += String.valueOf(region.getRx()) + " " + String.valueOf(region.getLy()) + ", ";
 			select += String.valueOf(region.getLx()) + " " + String.valueOf(region.getLy());
-			select += ")'), pt);";
-
-            System.out.println(select);
+			select += "))'), GeomFromText(AsText(pt)));";
 
 			ResultSet result = stmt.executeQuery(select);
+            System.out.println(select);
 
 			// loop through the results starting at the results we want to skip
 			while(result.next()) {
-					sqlResults.put(result.getString("ItemID"), result.getString("Name"));
+					// sqlResults.put(result.getString("ItemID"), result.getString("Name"));
+                System.out.println(result.getString("ItemID"));
 			}
 		}
          catch (SQLException ex) {
