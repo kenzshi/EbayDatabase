@@ -126,7 +126,7 @@ public class AuctionSearch implements IAuctionSearch {
             conn = DbManager.getConnection(true);
 			Statement stmt = conn.createStatement();
 
-			String select = "SELECT id FROM spatial_item WHERE ";
+			String select = "SELECT id, name FROM spatial_item WHERE ";
 			select += "MBRContains(GeomFromText('Polygon((";
 			select += String.valueOf(region.getLx()) + " " + String.valueOf(region.getLy()) + ", ";
 			select += String.valueOf(region.getLx()) + " " + String.valueOf(region.getRy()) + ", ";
