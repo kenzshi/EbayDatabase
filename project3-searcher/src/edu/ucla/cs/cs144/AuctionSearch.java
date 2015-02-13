@@ -120,7 +120,7 @@ public class AuctionSearch implements IAuctionSearch {
 		HashMap<String, String> sqlResults = new HashMap<String, String>();
 		Connection conn = null;
 
-		List<SearchResult> combinedResults = new ArrayList<SearchResult>();
+		ArrayList<SearchResult> combinedResults = new ArrayList<SearchResult>();
 
 		try {
             conn = DbManager.getConnection(true);
@@ -140,7 +140,7 @@ public class AuctionSearch implements IAuctionSearch {
 
 			// loop through the results starting at the results we want to skip
 			while(result.next()) {
-					sqlResults.put(result.getString("ItemID"), result.getString("Name"));
+					sqlResults.put(result.getString("id"), result.getString("name"));
                 // System.out.println(result.getString("ItemID"));
 			}
 
@@ -154,7 +154,7 @@ public class AuctionSearch implements IAuctionSearch {
             System.out.println(ex);
         }
 
-		return combinedResults.toArray();
+		return combinedResults.toArray(new SearchResult[combinedResults.size()]);
 	}
 
 	public String getXMLDataForItemId(String itemId) {
