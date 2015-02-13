@@ -69,7 +69,7 @@ public class AuctionSearch implements IAuctionSearch {
 
 
 	private IndexSearcher searcher = null;
-    private QueryParser parser = null;
+  private QueryParser parser = null;
 
 	public SearchResult[] basicSearch(String query, int numResultsToSkip,
 			int numResultsToReturn) {
@@ -77,20 +77,20 @@ public class AuctionSearch implements IAuctionSearch {
 		// Code for Part A below
 
 		/****************************************************
-     		Following tutorial code provided by
-     		http://www.cs.ucla.edu/classes/winter15/cs144/projects/lucene/index.html
+				Following tutorial code provided by
+				http://www.cs.ucla.edu/classes/winter15/cs144/projects/lucene/index.html
 		****************************************************/
 
 		SearchResult[] results = null;
 		try{ //Set up trycatch for IOException and ParseException
 			//Set up our Lucene index
 			searcher = new IndexSearcher(DirectoryReader.open(FSDirectory.open(new File("/var/lib/lucene/index1/"))));
-	        parser = new QueryParser("union", new StandardAnalyzer());
+					parser = new QueryParser("union", new StandardAnalyzer());
 
-	        Query queryString = parser.parse(query);
+					Query queryString = parser.parse(query);
 
-	        //Now search through our index
-	        int totalResults = numResultsToSkip + numResultsToReturn;
+					//Now search through our index
+					int totalResults = numResultsToSkip + numResultsToReturn;
 			TopDocs topDocs = searcher.search(queryString, totalResults);
 
 			ScoreDoc[] hits = topDocs.scoreDocs;
@@ -99,16 +99,16 @@ public class AuctionSearch implements IAuctionSearch {
 
 			// loop through the results starting at the results we want to skip
 			for (int i = numResultsToSkip; i < hits.length; i++) {
-			    Document doc = searcher.doc(hits[i].doc);
-			    results[i - numResultsToSkip] = new SearchResult(doc.get("ItemID"),doc.get("Name"));
+					Document doc = searcher.doc(hits[i].doc);
+					results[i - numResultsToSkip] = new SearchResult(doc.get("id"),doc.get("name"));;
 			}
 		} catch (IOException e) {
-            	System.out.println(e);
-        	} catch (ParseException pe){
-        		System.out.println(pe);
-        	}
+				System.out.println(e);
+		} catch (ParseException pe){
+			System.out.println(pe);
+		}
 
-        return results;
+		return results;
 	}
 
 	public SearchResult[] spatialSearch(String query, SearchRegion region,
