@@ -1,21 +1,22 @@
 <html>
     <head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
     <title>eBay Search: Project 4</title>
         <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
     </head>
     <body>
+        <div class= "container">
     	<h1>Item Search</h1>
-        <div>
-            <h2>Search Item by ID:<h2>
-            <form action="item" method="GET">
-                <div>
-                    <input name="id" type="text"/>    
+            <h4>Search Item by ID:<h4>
+            <form class="form-inline" action="item" method="GET">
+                <div class="form-group">
+                    <input class="form-control" name="id" type="text"/>
+                    <button class="btn btn-default" type="submit">Search</button>    
                 </div>
-                <button type="submit">Search</button>
             </form>
         </div>
         
-        <div>
+        <div class= "container">
         <p><b>Item Name:</b> <span id="name"></span></p>
         <p><b>Item ID:</b> <span id="itemid"></span></p>
         <p><b>Categories:</b> <span id="categories"></span></p>

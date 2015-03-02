@@ -1,18 +1,21 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ page import="edu.ucla.cs.cs144.*" %>
 <html>
-	<head><title>eBay Search: Project 4</title></head>
+	<head>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+		<title>eBay Search: Project 4</title>
+	</head>
 	<body>
+		<div class= "container">
 		<h1>Keyword Search</h1>
-		<div>
-		<h2>Search results for "<%= request.getAttribute("query") %>": </h2>
-		    <form action="search" method="GET">
-                <div>
-                    <input name="q" type="text"/>    
+		<h4>Search results for "<%= request.getAttribute("query") %>": </h4>
+		    <form class="form-inline" action="search" method="GET">
+                <div class="form-group">
+                    <input class="form-control" name="q" type="text"/>   
+                    <button class="btn btn-default" type="submit">Search</button> 
                 </div>
                 <input name="numResultsToSkip" type="hidden" value="0" />
                 <input name="numResultsToReturn" type="hidden" value="20" />
-                <button type="submit">Search</button>
             </form>
 
 			<%
@@ -33,7 +36,19 @@
     		<%}%>
 			<br/>
 
-			<table>
+			<div class="text-right">
+			<div class="lead">
+			<%if (numResultsToSkip > 0) { %>
+			<div class="pull-left"><a href="/eBay/search?q=<%= query %>&numResultsToSkip=<%= numResultsToSkip - numResultsToReturn %>&numResultsToReturn=<%= numResultsToReturn %>">Previous  </a></div>
+			<% } 
+
+			if (totalResults - numResultsToReturn - numResultsToSkip >= 0) {%>
+			<a href="/eBay/search?q=<%= query %>&numResultsToSkip=<%= numResultsToSkip + numResultsToReturn %>&numResultsToReturn=<%= numResultsToReturn %>"> Next</a>
+			<%}%>
+			</div>
+			</div>
+
+			<table class="table">
 		      <c:forEach items="${results}" var="search">
 		        <tr>
 		            <td><a href='item?id=<c:out value="${search.itemId}"/>'><c:out value="${search.itemId}"/></a>:</td>
@@ -42,14 +57,7 @@
 		      </c:forEach>
 			</table>
 
-			<br/>
-			<%if (numResultsToSkip > 0) { %>
-			<a href="/eBay/search?q=<%= query %>&numResultsToSkip=<%= numResultsToSkip - numResultsToReturn %>&numResultsToReturn=<%= numResultsToReturn %>">Previous Page</a>
-			<% } 
 
-			if (totalResults - numResultsToReturn - numResultsToSkip >= 0) {%>
-			<a href="/eBay/search?q=<%= query %>&numResultsToSkip=<%= numResultsToSkip + numResultsToReturn %>&numResultsToReturn=<%= numResultsToReturn %>">Next Page</a>
-			<%}%>
 		</div>
 	</body>
 </html>

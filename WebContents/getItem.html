@@ -1,14 +1,17 @@
 <html>
-    <head><title>eBay Search: Project 4</title></head>
+    <head>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+        <title>eBay Search: Project 4</title>
+    </head>
     <body>
-    	<h1>Item Search</h1>
-        <div>
-            <h2>Search Item by ID:<h2>
-            <form action="item" method="GET">
-                <div>
-                    <input name="id" type="text"/>    
+        <div class= "container">
+        <h1>Item Search</h1>
+            <h4>Search Item by ID:<h4>
+            <form class="form-inline" action="item" method="GET">
+                <div class="form-group">
+                    <input class="form-control" name="id" type="text"/>
+                    <button class="btn btn-default" type="submit">Search</button>    
                 </div>
-                <button type="submit">Search</button>
             </form>
         </div>
     </body>

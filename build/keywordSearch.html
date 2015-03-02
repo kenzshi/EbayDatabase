@@ -1,16 +1,19 @@
 <html>
-    <head><title>eBay Search: Project 4</title></head>
+    <head>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+        <title>eBay Search: Project 4</title>
+    </head>
     <body>
-    	<h1>Keyword Search</h1>
-        <div>
-            <h2>Search Auction:<h2>
-            <form action="search" method="GET">
-                <div>
-                    <input name="q" type="text"/>    
+        <div class= "container">
+         <h1>Keyword Search</h1>
+            <h4>Search Auction:<h4>
+            <form class="form-inline" action="search" method="GET">
+                <div class="form-group">
+                    <input class="form-control" name="q" type="text"/>    
+                    <button class="btn btn-default" type="submit">Search</button>
                 </div>
                 <input name="numResultsToSkip" type="hidden" value="0" />
                 <input name="numResultsToReturn" type="hidden" value="20" />
-                <button type="submit">Search</button>
             </form>
         </div>
     </body>
