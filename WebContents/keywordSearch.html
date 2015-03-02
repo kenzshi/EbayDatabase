@@ -1,18 +1,16 @@
 <html>
-    <head><title>Keyword Search</title></head>
+    <head><title>eBay Search: Project 4</title></head>
     <body>
     	<h1>Keyword Search</h1>
         <div>
             <h2>Search Auction:<h2>
-            <form action="./search" method="GET">
-                <div class="input-container">
-                    <input id="keyword-search" name="q" type="text"/>    
+            <form action="search" method="GET">
+                <div>
+                    <input name="q" type="text"/>    
                 </div>
                 <input name="numResultsToSkip" type="hidden" value="0" />
                 <input name="numResultsToReturn" type="hidden" value="20" />
                 <button type="submit">Search</button>
-                <div id="search-container">
-                </div>
             </form>
         </div>
     </body>
