@@ -34,8 +34,29 @@
         <p><b>Started:</b> <span id="started"></span></p>
         <p><b>Ends:</b> <span id="ends"></span></p>
         <p><b>Description:</b> <span id="description"></span></p>
-
+        <div id="map_canvas" style="width:500px; height:500px"></div> 
         </div>
+        <script type="text/javascript" 
+            src="http://maps.google.com/maps/api/js?sensor=false"> 
+        </script> 
+        <script type="text/javascript"> 
+          function initialize() { 
+            var lat = 0;
+            var lon = 0;
+            if ($xml.find("Location").attr("Longitude") && $xml.find("Location").attr("Latitude")) {
+                lat = $xml.find("Location").attr("Latitude");
+                lon = $xml.find("Location").attr("Longitude");
+            }
+            var latlng = new google.maps.LatLng(lat,lon); 
+            var myOptions = { 
+              zoom: 14, // default is 8  
+              center: latlng, 
+              mapTypeId: google.maps.MapTypeId.ROADMAP 
+            }; 
+            var map = new google.maps.Map(document.getElementById("map_canvas"), 
+                myOptions); 
+          }
+        </script>
 
         <script>
         var xml_string = '<%= request.getAttribute("item") %>';
@@ -109,6 +130,7 @@
         bid_num++;
         $("#bids").append(print_bids);
       });
+        initialize();
         </script>
     </body>
 </html>
