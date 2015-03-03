@@ -34,7 +34,7 @@
         <p><b>Started:</b> <span id="started"></span></p>
         <p><b>Ends:</b> <span id="ends"></span></p>
         <p><b>Description:</b> <span id="description"></span></p>
-
+        <div id="map_canvas" style="width:500px; height:500px"></div> 
         </div>
         <script type="text/javascript" 
             src="http://maps.google.com/maps/api/js?sensor=false"> 
@@ -57,8 +57,6 @@
                 myOptions); 
           }
         </script>
- 
-        <div id="map_canvas" style="width:500px; height:500px"></div> 
 
         <script>
         var xml_string = '<%= request.getAttribute("item") %>';
