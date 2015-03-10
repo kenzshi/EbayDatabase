@@ -1,4 +1,4 @@
-Project 4
+Project 5
 
 **************************
 Kenneth Shi
@@ -9,13 +9,20 @@ Jia Dan Duan
 **************************
 
 
-References:
-- http://stackoverflow.com/questions/5503900/how-to-sort-an-array-of-objects-with-jquery-or-javascript (custom sort function for our Bids)
-- http://stackoverflow.com/questions/2163045/how-to-remove-line-breaks-from-a-file-in-java (Line break replacement)
-- http://api.jquery.com/jquery.parsexml/ (Parsing XML using jQuery)
+Q1: For which communication(s) do you use the SSL encryption? If you are encrypting the communication from (1) to (2) in Figure 2, for example, write (1)→(2) in your answer.
 
-Design Decisions:
 
-In Part A, the decision in setting up the ItemServlet was to pass in the entire XML file, and then use jQuery/Javascript to parse the XML for display on the item.jsp file. This was mainly because I wanted to learn jQuery and thought this was a good oppurtunity to do so. 
 
-In Part B, we followed the tutorial that was posted on the website, and then used the xmlhttprequest functionality to get our suggestions to work.
+
+Q2: How do you ensure that the item was purchased exactly at the Buy_Price of that particular item?
+
+
+
+
+Note: If you get help from any source other than those mentioned in this page, at the end of your README, please clearly cite all references you use, and breifly explain how they help you, such as which portion(s) is/are particularly helpful.
+
+References: 
+
+(Class tutorials to get started)
+http://www.cs.ucla.edu/classes/winter15/cs144/projects/tomcat/ssl_tomcat_tutorial.html
+http://www.cs.ucla.edu/classes/winter15/cs144/projects/java/session/index.html

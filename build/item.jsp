@@ -23,7 +23,12 @@
         <p><b>Seller ID:</b> <span id="sellerid"></span></p>
         <p><b>Seller Rating:</b> <span id="sellerrating"></span></p>
         <p><b>Current Price:</b> <span id="currently"></span></p>
-        <p id="buy_display"><b>Buy Price:</b> <span id="buyprice"></span></p>
+        <p id="buy_display"> <b>Buy Price:</b><span id="buyprice"></span>
+            <form id="buy_form" class="form-inline" action="purchase" method="GET">
+                <input type="hidden" name="id" value="<%=request.getAttribute("id")%>" />
+                <button class="btn btn-default" type="submit">Purchase Now!</button>   
+            </form>
+        </p>
         <p><b>First Bid:</b> <span id="firstbid"></span></p>
         <p><b>Number of Bids:</b> <span id="numbids"></span></p>
         <p id="bids_display"><b>Bids:</b> <span id="bids"></span></p>
@@ -78,6 +83,7 @@
             $("#buyprice").text($xml.find("Buy_Price").text());
         } else {
             $("#buy_display").hide();
+            $("#buy_form").hide();
         }
         $("#firstbid").text($xml.find("First_Bid").text());
         $("#numbids").text($xml.find("Number_of_Bids").text());
