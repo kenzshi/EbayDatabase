@@ -10,6 +10,13 @@ import javax.servlet.http.HttpSession;
 import java.io.PrintWriter;
 import java.util.Date;
 
+//Document builder for parsing
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.DocumentBuilder;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
+import java.io.StringReader;
+
 public class ItemServlet extends HttpServlet implements Servlet {
        
     public ItemServlet() {}
@@ -26,13 +33,33 @@ public class ItemServlet extends HttpServlet implements Servlet {
 
         String item_xml = AuctionSearchClient.getXMLDataForItemId(item_id);
 
+        //Document building for parsing purchases
+        try{
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        InputSource input = new InputSource(new StringReader(item_xml));
+        Document doc = builder.parse(input);
+
+        //Get Name && buy price
+        String item_name = doc.getElementsByTagName("Name").item(0).getTextContent();
+        String buy_price = doc.getElementsByTagName("Buy_Price").item(0).getTextContent();
+
+
         session.setAttribute(item_id, item_xml); 
         //Replace the newlines and spaces in our item_XML so our jQuery parser will work
         item_xml = item_xml.replace("\n", "").replace("\r", "").replace("\t","").replace("\'","\\\'");
 
+        //Setting information for purchases
+        session.setAttribute("name",item_name);
+        session.setAttribute("buyprice",buy_price);
+
+        //Other information for jquery parsing
         request.setAttribute("item", item_xml);
         request.setAttribute("id", item_id);
         request.getRequestDispatcher("/item.jsp").forward(request, response);
+        } catch (Exception e) {
+            
+        } 
 
     }
 }

@@ -8,25 +8,19 @@
         <div class= "container">
     	<h1>Item Purchase</h1>
             <h4>Enter Credit Care Information Below:<h4>
-        <p><b>Item Name:</b> <span id="name"></span></p>
-        <p><b>Item ID:</b> <span id="itemid"></span></p>
-        <p><b>Buy Price:</b> <span id="buyprice"></span> </p> 
+        <p><b>Item Name:</b> <span id="name"><%=request.getAttribute("name")%></span></p>
+        <p><b>Item ID:</b> <span id="itemid"><%=request.getAttribute("id")%></span></p>
+        <p><b>Buy Price:</b> <span id="buyprice"><%=request.getAttribute("buyprice")%></span> </p> 
 
-        <form class="form-inline" action="purchase" method="POST">
+        <% String ssl_url = "https://" + request.getServerName() + ":8443" + request.getContextPath() + "/purchase"; %>
+        <form class="form-inline" action="<%=ssl_url%>" method="POST">
             <p><b>Credit Card Number:</b></p> 
-
             <input type="hidden" name="id" value="<%=request.getAttribute("id")%>" />
-            <input type="submit" value="Pay Now" />
+            <input type="hidden" name="buyprice" value="<%=request.getAttribute("buyprice")%>" />
+            <input class="form-control" type="number" name="credit_card" />
+            <button class="btn btn-default" type="submit">Pay Now!</button>
         </form>
     
         </div>
-        <script type="text/javascript">
-        var xml_string = '<%= request.getAttribute("item") %>';
-        $xml = $(xml_string);
-
-        $("#name").text($xml.find("Name").text());
-        $("#itemid").text(<%=request.getAttribute("id")%>);
-        $("#buyprice").text($xml.find("Buy_Price").text());
-        </script>
     </body>
 </html>

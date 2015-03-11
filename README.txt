@@ -26,3 +26,6 @@ References:
 (Class tutorials to get started)
 http://www.cs.ucla.edu/classes/winter15/cs144/projects/tomcat/ssl_tomcat_tutorial.html
 http://www.cs.ucla.edu/classes/winter15/cs144/projects/java/session/index.html
+
+(Tomcat documentation for usage information)
+https://tomcat.apache.org/tomcat-5.5-doc/servletapi/javax/servlet/http/HttpSession.html

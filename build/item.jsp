@@ -24,7 +24,7 @@
         <p><b>Seller Rating:</b> <span id="sellerrating"></span></p>
         <p><b>Current Price:</b> <span id="currently"></span></p>
         <p id="buy_display"> <b>Buy Price:</b><span id="buyprice"></span>
-            <form id="buy_form" class="form-inline" action="purchase" method="GET">
+            <form id="buy_form" class="form-inline" action="purchase" method="POST">
                 <input type="hidden" name="id" value="<%=request.getAttribute("id")%>" />
                 <button class="btn btn-default" type="submit">Pay Now!</button>   
             </form>
