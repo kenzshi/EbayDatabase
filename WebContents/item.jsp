@@ -79,7 +79,7 @@
         $("#sellerid").text($xml.find("Seller").attr("UserID"));
         $("#sellerrating").text($xml.find("Seller").attr("Rating"));
         $("#currently").text($xml.find("Currently").text());
-        if($xml.find("Buy_Price").text() != ""){
+        if($xml.find("Buy_Price").text() != "" && $xml.find("Buy_Price").text() != "$0"){
             $("#buyprice").text($xml.find("Buy_Price").text());
         } else {
             $("#buy_display").hide();

@@ -40,14 +40,15 @@ public class ItemServlet extends HttpServlet implements Servlet {
         InputSource input = new InputSource(new StringReader(item_xml));
         Document doc = builder.parse(input);
 
+        String buy_price = "";
         //Get Name && buy price
         String item_name = doc.getElementsByTagName("Name").item(0).getTextContent();
-        String buy_price = doc.getElementsByTagName("Buy_Price").item(0).getTextContent();
-
-
-        session.setAttribute(item_id, item_xml); 
+        if (doc.getElementsByTagName("Buy_Price").getLength() != 0) {
+            buy_price = doc.getElementsByTagName("Buy_Price").item(0).getTextContent();
+        }
         //Replace the newlines and spaces in our item_XML so our jQuery parser will work
         item_xml = item_xml.replace("\n", "").replace("\r", "").replace("\t","").replace("\'","\\\'");
+        session.setAttribute(item_id, item_xml); 
 
         //Setting information for purchases
         session.setAttribute("name",item_name);
