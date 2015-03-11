@@ -25,6 +25,11 @@ public class PurchaseServlet extends HttpServlet implements Servlet {
           item_id = "";
 
         String item_xml = (String)session.getAttribute(item_id);
+
+        if (item_xml == null || item_xml.length() == 0) {
+            item_xml = AuctionSearchClient.getXMLDataForItemId(item_id);
+        }
+        
         //Replace the newlines and spaces in our item_XML so our jQuery parser will work
         item_xml = item_xml.replace("\n", "").replace("\r", "").replace("\t","").replace("\'","\\\'");
 
