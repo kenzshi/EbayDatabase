@@ -14,6 +14,7 @@ public class ItemServlet extends HttpServlet implements Servlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
     {
         // your codes here
+        HttpSession session = request.getSession(true);
 
         String item_id = request.getParameter("id");
 
