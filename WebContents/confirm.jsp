@@ -12,6 +12,7 @@
         <p><b>Item ID:</b> <span id="itemid"><%=request.getAttribute("id")%></span></p>
         <p><b>Buy Price:</b> <span id="buyprice"><%=request.getAttribute("buyprice")%></span></p> 
         <p><b>Credit Card Number:</b> <span id="creditcard"><%=request.getAttribute("creditcard")%></span></p> 
+        <p><b>Transaction Time:</b> <span id="transtime"><%=request.getAttribute("transtime")%></span> </p> 
 
         </div>
     </body>

@@ -18,7 +18,7 @@
             <input type="hidden" name="id" value="<%=request.getAttribute("id")%>" />
             <input type="hidden" name="buyprice" value="<%=request.getAttribute("buyprice")%>" />
             <input class="form-control" type="number" name="credit_card" />
-            <button class="btn btn-default" type="submit">Pay Now!</button>
+            <button class="btn btn-default" type="submit">Submit!</button>
         </form>
     
         </div>

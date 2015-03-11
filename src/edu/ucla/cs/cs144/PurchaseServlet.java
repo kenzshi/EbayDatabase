@@ -30,6 +30,7 @@ public class PurchaseServlet extends HttpServlet implements Servlet {
             request.setAttribute("buyprice",buy_price);
             request.setAttribute("id", item_id);
             request.setAttribute("creditcard", request.getParameter("credit_card"));
+            request.setAttribute("transtime", new Date(session.getLastAccessedTime()));
 
             request.getRequestDispatcher("/confirm.jsp").forward(request, response);
         }
