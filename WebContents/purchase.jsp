@@ -20,11 +20,7 @@
         </form>
     
         </div>
-        <script type="text/javascript" 
-            src="http://maps.google.com/maps/api/js?sensor=false"> 
-        </script> 
-
-        <script>
+        <script type="text/javascript">
         var xml_string = '<%= request.getAttribute("item") %>';
         $xml = $(xml_string);
 

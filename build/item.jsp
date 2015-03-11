@@ -26,7 +26,7 @@
         <p id="buy_display"> <b>Buy Price:</b><span id="buyprice"></span>
             <form id="buy_form" class="form-inline" action="purchase" method="GET">
                 <input type="hidden" name="id" value="<%=request.getAttribute("id")%>" />
-                <button class="btn btn-default" type="submit">Purchase Now!</button>   
+                <button class="btn btn-default" type="submit">Pay Now!</button>   
             </form>
         </p>
         <p><b>First Bid:</b> <span id="firstbid"></span></p>
